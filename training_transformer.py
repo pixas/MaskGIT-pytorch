@@ -33,8 +33,11 @@ class TrainTransformer:
             log, sampled_imgs = self.model.log_images(imgs[0][None])
             vutils.save_image(sampled_imgs, os.path.join("results", f"{epoch}.jpg"), nrow=4)
             plot_images(log)
-            torch.save(self.model.state_dict(), os.path.join("checkpoints", f"transformer_epoch_{epoch}.pt"))
-
+            cur_save_dir = os.path.join(args.save_dir, f"transformer_epoch_{epoch}.pt")
+            torch.save(self.model.state_dict(), cur_save_dir)
+            os.syastem("cp -r {} {}".format(cur_save_dir, os.pth.join(args.save_dir, f"ckpt-last.pt")))
+            
+            
     def configure_optimizers(self):
         decay, no_decay = set(), set()
         whitelist_weight_modules = (nn.Linear,)
@@ -67,12 +70,13 @@ class TrainTransformer:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="VQGAN")
     parser.add_argument('--latent-dim', type=int, default=256, help='Latent dimension n_z.')
+    parser.add_argument("--save-dir", type=str, default="/dataset/jsy/", help="ckpt save directory")
     parser.add_argument('--image-size', type=int, default=256, help='Image height and width.)')
     parser.add_argument('--num-codebook-vectors', type=int, default=1024, help='Number of codebook vectors.')
     parser.add_argument('--beta', type=float, default=0.25, help='Commitment loss scalar.')
     parser.add_argument('--image-channels', type=int, default=3, help='Number of channels of images.')
     parser.add_argument('--dataset-path', type=str, default='./data', help='Path to data.')
-    parser.add_argument('--checkpoint-path', type=str, default='./checkpoints/last_ckpt.pt', help='Path to checkpoint.')
+    parser.add_argument('--checkpoint-path', type=str, default='None', help='Path to checkpoint.')
     parser.add_argument('--device', type=str, default="cuda", help='Which device the training is on')
     parser.add_argument('--batch-size', type=int, default=10, help='Input batch size for training.')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs to train.')

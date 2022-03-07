@@ -51,6 +51,9 @@ class VQGAN(nn.Module):
         return disc_factor
 
     def load_checkpoint(self, path):
-        self.load_state_dict(torch.load(path))
-        print("Loaded Checkpoint for VQGAN....")
+        if path == 'None':
+            print("No checkpoint specified. Training from beginning...")
+        else:
+            self.load_state_dict(torch.load(path))
+            print("Loaded Checkpoint for VQGAN....")
 
